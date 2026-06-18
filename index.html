@@ -1110,26 +1110,39 @@ Only badge:true on the top pick. urgency values: crit, warn, or none. shop must 
 
   let apiKey=getAnthropicKey();
   if(!apiKey){
-    apiKey=window.prompt('Enter your Anthropic API key (saved locally in your browser):');
-    if(!apiKey){hideRecipeOverlay();return;}
+    apiKey=window.prompt('Enter your Anthropic API key (starts with sk-ant-...). It will be saved in your browser only.');
+    if(!apiKey){closeOverlay();btn.disabled=false;return;}
     setAnthropicKey(apiKey.trim());
+    apiKey=apiKey.trim();
   }
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:3000,
-        messages:[{role:'user',content:prompt}]
-      })
-    });
+    let res;
+    try{
+      res=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({
+          model:'claude-sonnet-4-20250514',
+          max_tokens:3000,
+          messages:[{role:'user',content:prompt}]
+        })
+      });
+    }catch(netErr){
+      throw new Error('Network error — check your internet connection. ('+netErr.message+')');
+    }
+    if(res.status===401||res.status===403){
+      localStorage.removeItem('dk_anthropic_key');
+      throw new Error('Invalid API key ('+res.status+'). Your saved key was cleared — try again and re-enter it.');
+    }
+    if(!res.ok){
+      const errBody=await res.json().catch(()=>({}));
+      throw new Error('API error '+res.status+': '+(errBody?.error?.message||res.statusText));
+    }
     const data=await res.json();
     if(data.error)throw new Error(data.error.message);
     const text=data.content?.find(b=>b.type==='text')?.text||'';
     const match=text.match(/\[[\s\S]*\]/);
     if(!match)throw new Error('No JSON array found in response');
-    // Sanitise: replace any unescaped apostrophes inside JSON strings before parsing
     const sanitised=sanitiseJSON(match[0]);
     const recipes=JSON.parse(sanitised);
     shownRecipes.push(...recipes.map(r=>r.name));
