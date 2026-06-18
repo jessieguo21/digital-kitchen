@@ -751,7 +751,8 @@ const SEED=[
 {"id":1781106187121.4297,"name":"apple cider vinegar","displayName":"apple cider vinegar","zone":"pantry","cat":"produce","perish":"high","ts":1781106187121,"pinnedShelf":"p1"}
 ];
 
-const ANTHROPIC_KEY='YOUR_ANTHROPIC_API_KEY_HERE';
+function getAnthropicKey(){return localStorage.getItem('dk_anthropic_key')||'';}
+function setAnthropicKey(k){localStorage.setItem('dk_anthropic_key',k);}
 const SUPA_URL='https://diqojrfxpypbjfamwfbd.supabase.co/rest/v1';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpcW9qcmZ4cHlwYmpmYW13ZmJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MDgzODYsImV4cCI6MjA5NzA4NDM4Nn0.cQJ1sdpyrKsmPXMNbCiOy4ZJp6QSDvVlk-l7OxxKS6w';
 const SUPA_HDR={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY};
@@ -1107,10 +1108,16 @@ Schema for each recipe (follow exactly):
 
 Only badge:true on the top pick. urgency values: crit, warn, or none. shop must be present (empty array [] if grocery mode off).`;
 
+  let apiKey=getAnthropicKey();
+  if(!apiKey){
+    apiKey=window.prompt('Enter your Anthropic API key (saved locally in your browser):');
+    if(!apiKey){hideRecipeOverlay();return;}
+    setAnthropicKey(apiKey.trim());
+  }
   try{
     const res=await fetch('https://api.anthropic.com/v1/messages',{
       method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',
         max_tokens:3000,
