@@ -1,11 +1,11 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fraunces:ital,wght@0,700;0,900;1,700;1,900&family=DM+Sans:wght@300;400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#1a1a1a;display:flex;justify-content:center;align-items:center;padding:16px;min-height:100vh}
+body{background:#f0ebe0;display:flex;justify-content:center;align-items:flex-start;padding-top:100px;padding-left:16px;padding-right:16px;padding-bottom:40px;min-height:100vh}
 
 /* ── RECIPE OVERLAY ─────────────────────────────────────────────────── */
 #recipe-overlay{position:fixed;inset:0;z-index:99999;background:#fafaf8;overflow-y:auto;display:none;font-family:'DM Sans',sans-serif;color:#1e2240}
@@ -78,8 +78,8 @@ body{background:#1a1a1a;display:flex;justify-content:center;align-items:center;p
 @keyframes rosweep{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
 .ro-err{background:#fdf0f0;border:1px solid #e8b0b0;border-radius:12px;padding:20px;color:#b84040;font-size:13px;line-height:1.7;text-align:center}
 #app{font-family:'Press Start 2P',monospace;width:100%;max-width:820px}
-.title{font-size:21px;color:#888;text-align:center;margin-bottom:14px;letter-spacing:2px}
-.kitchen-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px}
+.title{font-size:21px;color:#4a3a2a;text-align:center;margin-bottom:14px;letter-spacing:2px}
+.kitchen-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:12px;align-items:end}
 .fridge-outer{background:#dde4ec;border:3px solid #9aaab8;border-radius:10px 10px 5px 5px;box-shadow:inset -5px 0 0 #c2cdd8,inset 5px 0 0 #eef2f6}
 .fridge-topbar{background:#c8d4de;height:11px;border-radius:8px 8px 0 0;border-bottom:2px solid #9aaab8;display:flex;align-items:center;justify-content:center}
 .fridge-handle{width:28px;height:5px;background:#8a9ab0;border-radius:3px}
@@ -103,7 +103,7 @@ body{background:#1a1a1a;display:flex;justify-content:center;align-items:center;p
 .item.hi{outline-color:#ffe87c}
 .item.dragging{opacity:0.25;cursor:grabbing}
 .item canvas{width:40px;height:40px;image-rendering:pixelated;display:block}
-.item-lbl{font-size:6px;color:#e8e8e8;text-align:center;max-width:52px;line-height:1.4;word-break:break-word;text-shadow:0 1px 3px #000,0 0 5px #000}
+.item-lbl{font-size:6px;color:#e8e8e8;text-align:center;max-width:60px;line-height:1.5;word-break:break-word;white-space:normal;text-shadow:0 1px 3px #000,0 0 5px #000}
 .fridge-inner .item-lbl{color:#1a3050;text-shadow:none}
 .drop-zone-active{outline:2px dashed #ffe87c88!important}
 #drag-ghost{position:fixed;pointer-events:none;z-index:99999;opacity:0.9;transform:scale(1.2)}
@@ -118,7 +118,7 @@ body{background:#1a1a1a;display:flex;justify-content:center;align-items:center;p
 .ita:focus{border-color:#5b8cff}
 .ibtn{font-family:'Press Start 2P',monospace;font-size:15px;background:#0d200d;border:2px solid #3a8a3a;color:#7ae87a;padding:0 16px;cursor:pointer}
 .ibtn:hover{background:#3a8a3a;color:#fff}
-.istat{font-size:13.5px;color:#ffe87c;min-height:16px;margin-top:8px;line-height:2}
+.istat{font-size:13.5px;color:#3a5888;min-height:16px;margin-top:8px;line-height:2}
 .ihint{font-size:12px;color:#444;margin-top:5px;line-height:2}
 .ihint b{color:#c86060}
 .dym-box{background:#1a1200;border:2px solid #ffe87c;padding:10px;margin-top:10px;display:none}
@@ -202,8 +202,7 @@ body{background:#1a1a1a;display:flex;justify-content:center;align-items:center;p
 <div id="app">
   <div class="title">&#9733; JESSIE'S DIGITAL KITCHEN &#9733;</div>
   <div class="kitchen-row">
-    <div>
-      <div class="fridge-outer">
+    <div style="position:relative">      <div class="fridge-outer" style="position:relative;">
         <div class="fridge-topbar"><div class="fridge-handle"></div></div>
         <div class="fridge-inner">
           <div class="fshelf"><div class="fshelf-lbl">DAIRY &middot; EGGS &middot; DRINKS</div><div class="fshelf-row" id="f0"></div></div>
@@ -272,7 +271,7 @@ function undo(){
   if(!history.length)return;
   items=JSON.parse(history.pop());
   save();renderAll();
-  setStatus('\u21a9 UNDONE');setTimeout(()=>setStatus(''),2000);
+  setStatus('↩ UNDONE');setTimeout(()=>setStatus(''),2000);
 }
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'){e.preventDefault();undo();}});
 
@@ -421,7 +420,67 @@ crackers:{c:['#d8c870','#f8e890','#a09040','#1a1a1a'],p:[
 [0,4,4,4,4,4,4,4,4,4,4,0]]},
 kefir:{c:['#e8f4e8','#ffffff','#b0ccb0','#1a1a1a'],p:[[0,0,4,4,4,4,4,4,4,4,0,0],[0,4,1,1,1,1,1,1,1,1,4,0],[4,1,2,2,1,1,1,1,1,1,1,4],[4,1,2,1,1,1,1,1,1,1,1,4],[4,1,1,1,1,1,1,1,1,1,1,4],[4,1,1,3,1,1,1,1,3,1,1,4],[4,1,1,1,3,3,3,3,1,1,1,4],[4,1,1,3,1,1,1,1,3,1,1,4],[4,1,1,1,1,1,1,1,1,1,1,4],[0,4,1,1,1,1,1,1,1,1,4,0],[0,0,4,4,4,4,4,4,4,4,0,0],[0,0,0,0,0,0,0,0,0,0,0,0]]},
 milk:{c:['#f8f6f0','#ffffff','#d0ccc0','#1a1a1a'],p:[[0,0,0,4,4,4,4,0,0,0,0,0],[0,0,0,4,2,1,4,0,0,0,0,0],[0,0,4,1,1,1,1,4,0,0,0,0],[0,4,1,2,1,1,1,1,4,0,0,0],[0,4,1,1,1,1,1,1,4,0,0,0],[0,4,1,1,1,1,1,1,4,0,0,0],[0,4,1,1,1,1,1,1,4,0,0,0],[0,4,1,1,1,3,1,1,4,0,0,0],[0,4,1,1,3,3,3,1,4,0,0,0],[0,4,1,1,1,3,1,1,4,0,0,0],[0,0,4,1,1,1,1,4,0,0,0,0],[0,0,0,4,4,4,4,0,0,0,0,0]]},
-// ── STANDARD SPRITES ─────────────────────────────────────────────────────────
+// Garlic: white papery bulb with green shoot, clove divisions visible
+garlic:{c:['#f0ece0','#ffffff','#c8c4a8','#1a1a1a'],_extra:['#3a6820'],p:[
+[0,0,0,0,0,5,0,0,0,0,0,0],
+[0,0,0,0,4,5,4,0,0,0,0,0],
+[0,0,0,4,1,2,1,4,0,0,0,0],
+[0,0,0,4,1,2,1,4,0,0,0,0],
+[0,0,4,1,1,2,1,1,4,0,0,0],
+[0,4,1,1,2,1,1,1,1,4,0,0],
+[0,4,1,4,1,1,1,1,4,1,4,0],
+[0,4,1,4,1,1,1,1,4,1,4,0],
+[0,4,1,1,1,1,1,1,1,1,4,0],
+[0,0,4,1,1,3,3,1,1,4,0,0],
+[0,0,0,4,3,3,3,3,4,0,0,0],
+[0,0,0,0,4,4,4,4,0,0,0,0]]},
+
+// Banana: yellow curved shape with brown tips, diagonal orientation
+banana:{c:['#f8d820','#fff880','#c8a800','#1a1a1a'],_extra:['#7a5010'],p:[
+[0,0,0,0,0,4,5,4,0,0,0,0],
+[0,0,0,0,4,1,1,4,0,0,0,0],
+[0,0,0,4,1,2,1,1,4,0,0,0],
+[0,0,4,1,2,1,1,1,4,0,0,0],
+[0,4,1,2,1,1,1,1,4,0,0,0],
+[0,4,1,1,1,1,1,1,4,0,0,0],
+[0,4,1,1,1,1,1,4,0,0,0,0],
+[0,0,4,1,1,1,1,4,0,0,0,0],
+[0,0,4,1,3,1,4,0,0,0,0,0],
+[0,0,0,4,5,5,4,0,0,0,0,0],
+[0,0,0,0,4,4,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,0,0,0,0]]},
+
+// Granola/Muesli: golden bag with scattered grain/oat texture dots
+granola:{c:['#d4a840','#f0c860','#a07020','#1a1a1a'],p:[
+[0,0,4,4,4,4,4,4,4,4,0,0],
+[0,4,2,2,2,2,2,2,2,2,4,0],
+[0,4,1,3,2,1,3,1,2,1,4,0],
+[0,4,1,1,1,3,1,1,1,3,4,0],
+[0,4,3,1,1,1,3,1,1,1,4,0],
+[0,4,1,1,3,1,1,1,3,1,4,0],
+[0,4,1,3,1,1,1,3,1,1,4,0],
+[0,4,1,1,1,3,1,1,1,1,4,0],
+[0,4,3,1,1,1,1,1,3,1,4,0],
+[0,4,1,1,3,1,1,3,1,1,4,0],
+[0,0,4,3,1,1,1,1,3,4,0,0],
+[0,0,0,4,4,4,4,4,4,0,0,0]]},
+
+// Noodles: straight white vertical strands in a bundle — NOT pasta
+noodles:{c:['#f4f0e4','#ffffff','#c8c4a8','#1a1a1a'],p:[
+[0,4,4,4,4,4,4,4,4,4,4,0],
+[4,2,2,2,2,2,2,2,2,2,2,4],
+[4,1,4,1,4,1,4,1,4,1,1,4],
+[4,1,4,1,4,1,4,1,4,1,1,4],
+[4,2,4,1,4,1,4,2,4,1,1,4],
+[4,1,4,1,4,1,4,1,4,1,1,4],
+[4,1,4,2,4,1,4,1,4,2,1,4],
+[4,1,4,1,4,1,4,1,4,1,1,4],
+[4,1,4,1,4,2,4,1,4,1,1,4],
+[4,1,4,1,4,1,4,1,4,1,3,4],
+[4,3,4,3,4,3,4,3,4,3,3,4],
+[0,4,4,4,4,4,4,4,4,4,4,0]]},
+
+
 cheese:{c:['#f5c020','#ffe060','#c09000','#1a1a1a'],p:[
 [0,0,4,4,4,4,4,4,4,4,4,0],
 [0,4,1,2,2,1,1,1,1,1,1,4],
@@ -513,8 +572,11 @@ function pickSprite(name){
   if(/cracker|crispbread/.test(n))return SPR.crackers;
   if(/cauliflow|cabbage|brussels|asparagus|leek|celery|fennel|pepper|capsicum|beetroot/.test(n))return SPR.carrot;
   if(/\brice\b|quinoa|couscous|bulgur|farro|barley/.test(n))return SPR.rice;
-  if(/\boat|muesli|granola/.test(n))return SPR.rice;
-  if(/\bpasta\b|spaghetti|penne|fusilli|rigatoni|tagliat|lasagne|noodle/.test(n))return SPR.pasta;
+  if(/\bgarlic\b/.test(n))return SPR.garlic;
+  if(/\bbanana/.test(n))return SPR.banana;
+  if(/\boat|muesli|granola/.test(n))return SPR.granola;
+  if(/\bnoodle/.test(n))return SPR.noodles;
+  if(/\bpasta\b|spaghetti|penne|fusilli|rigatoni|tagliat|lasagne/.test(n))return SPR.pasta;
   if(/lentil|chickpea|\bbean\b|legume|split.?pea/.test(n))return SPR.lentils;
   if(/flour|cornmeal|semolina|yeast/.test(n))return SPR.rice;
   if(/\bbread\b|pita|wrap|tortilla|bagel|crispbread/.test(n))return SPR.bread;
@@ -548,7 +610,8 @@ const KNOWN=[
   'broccoli','carrot','tomato','spinach','kale','lettuce','pepper','cucumber','zucchini',
   'courgette','cauliflower','cabbage','asparagus','leek','fennel','celery','beetroot',
   'apple','pear','lemon','lime','orange','mango','grapes','strawberry','blueberry',
-  'raspberry','peach','banana','kiwi','watermelon','grape',
+  'raspberry','peach','banana','kiwi','watermelon','grape','dates','date','fig','figs',
+  'raisin','raisins','prune','prunes','apricot','dried mango','dried fruit',
   'rice','quinoa','pasta','spaghetti','penne','lentils','chickpeas','oats','couscous',
   'barley','flour','bread','pita','wrap','tortilla','cracker',
   'olive oil','sesame oil','sunflower oil','vinegar','balsamic',
@@ -558,6 +621,7 @@ const KNOWN=[
   'parsley','coriander','dill','mint','thyme','rosemary','ginger','garlic','onion',
   'chocolate','peanut butter','almond butter','tahini','almonds','cashews','walnuts',
   'honey','maple syrup','sugar','coffee','tea','matcha',
+  'wine','white wine','red wine','rosé','beer','cider','sake','spirits','gin','vodka','whisky',
   'shallot','potato','sweet potato'
 ];
 
@@ -585,7 +649,7 @@ function fuzzyMatch(input){
       if(d<bestD){bestD=d;best=f;}
     }
   }
-  if(bestD<=2)return{match:n,confident:false,suggestion:best};
+  if(bestD<=1)return{match:n,confident:false,suggestion:best};
   return{match:n,confident:true,isBrand:true};
 }
 
@@ -620,6 +684,8 @@ const RULES=[
   {r:/\bcarrot|celery|leek|fennel/i,z:'fridge',c:'produce'},
   {r:/pepper|capsicum|cucumber|radish|beetroot/i,z:'fridge',c:'produce'},
   {r:/\btomato/i,z:'fridge',c:'produce'},
+  {r:/\bwine\b|white wine|red wine|ros[eé]|\bbeer\b|\bcider\b|\bsake\b/i,z:'pantry',c:'condiment'},
+  {r:/\bdates?\b|dried.?fruit|raisins?|prunes?|\bfigs?\b|apricots?/i,z:'pantry',c:'snack'},
   {r:/strawberr|raspberr|blueberr|blackberr|grape|melon|mango|peach|berry/i,z:'fridge',c:'produce'},
   {r:/apple|pear|lemon|lime|orange|grapefruit/i,z:'fridge',c:'produce'},
   {r:/herb|basil|parsley|coriander|cilantro|dill|chive|mint|thyme|rosemary/i,z:'fridge',c:'herb'},
@@ -661,53 +727,64 @@ function getShelf(zone,cat,pinnedShelf){
 
 const STORAGE_KEY='jessie_kitchen_v1';
 const SEED=[
-{"id":1777026451488.18,"name":"eggs","displayName":"eggs","zone":"fridge","cat":"egg","perish":"medium","ts":1777026451488},
-{"id":1777026455238.42,"name":"brocolli","displayName":"broccoli","zone":"fridge","cat":"produce","perish":"high","ts":1777026455238,"pinnedShelf":"f1"},
-{"id":1777485762380.59,"name":"greek yogurt","displayName":"greek yogurt","zone":"fridge","cat":"dairy","perish":"medium","ts":1777485762380},
-{"id":1777485766548.37,"name":"ground beef","displayName":"ground beef","zone":"fridge","cat":"meat","perish":"high","ts":1777485766548},
 {"id":1777485772175.62,"name":"olive oil","displayName":"olive oil","zone":"pantry","cat":"oil","perish":"low","ts":1777485772175},
-{"id":1777486049445.28,"name":"pasta","displayName":"pasta","zone":"pantry","cat":"pasta","perish":"low","ts":1777486049445},
-{"id":1777486348481.07,"name":"cucumber","displayName":"cucumber","zone":"fridge","cat":"produce","perish":"high","ts":1777486348481,"pinnedShelf":"f1"},
 {"id":1777486370555.77,"name":"shallots","displayName":"shallots","zone":"pantry","cat":"misc","perish":"low","ts":1777486370555,"pinnedShelf":"p2"},
-{"id":1777486460486.54,"name":"mint","displayName":"mint","zone":"fridge","cat":"herb","perish":"high","ts":1777486460486,"pinnedShelf":"f1"},
-{"id":1777486464954.40,"name":"parsley","displayName":"parsley","zone":"fridge","cat":"herb","perish":"high","ts":1777486464954,"pinnedShelf":"f1"},
 {"id":1777486511820.61,"name":"pasta sauce","displayName":"pasta sauce","zone":"pantry","cat":"sauce","perish":"low","ts":1777486511820},
-{"id":1777487344911.05,"name":"carrot","displayName":"carrot","zone":"fridge","cat":"produce","perish":"high","ts":1777487344911},
-{"id":1777487357322.31,"name":"cheese","displayName":"cheese","zone":"fridge","cat":"dairy","perish":"medium","ts":1777487357322,"pinnedShelf":"f0"},
-{"id":1777487371681.93,"name":"cottage cheese","displayName":"cottage cheese","zone":"fridge","cat":"dairy","perish":"medium","ts":1777487371681,"pinnedShelf":"f0"},
-{"id":1777487375721.73,"name":"zucchini","displayName":"zucchini","zone":"fridge","cat":"produce","perish":"high","ts":1777487375721},
-{"id":1777487381877.25,"name":"crackers","displayName":"crackers","zone":"pantry","cat":"bread","perish":"medium","ts":1777487381877},
 {"id":1777533287961.44,"name":"rice","displayName":"rice","zone":"pantry","cat":"grain","perish":"low","ts":1777533287961},
-{"id":1777533302286.05,"name":"green onion","displayName":"green onion","zone":"fridge","cat":"herb","perish":"high","ts":1777533302286,"pinnedShelf":"f1"},
-{"id":1777622390437.50,"name":"chicken drumsticks","displayName":"chicken drumsticks","zone":"fridge","cat":"meat","perish":"high","ts":1777622390437},
-{"id":1777622390439.19,"name":"napa cabbage","displayName":"napa cabbage","zone":"fridge","cat":"produce","perish":"high","ts":1777622390439},
-{"id":1777622390439.74,"name":"eggs","displayName":"eggs","zone":"fridge","cat":"egg","perish":"medium","ts":1777622390439},
-{"id":1777622390440.53,"name":"bananas","displayName":"bananas","zone":"pantry","cat":"misc","perish":"medium","ts":1777622390440}
+{"id":1778144556286.8416,"name":"noodles","displayName":"noodles","zone":"pantry","cat":"pasta","perish":"low","ts":1778144556286},
+{"id":1778149755262.1655,"name":"red lentils","displayName":"red lentils","zone":"pantry","cat":"grain","perish":"low","ts":1778149755262},
+{"id":1780694932902.8545,"name":"eggs","displayName":"eggs","zone":"fridge","cat":"egg","perish":"medium","ts":1780694932902},
+{"id":1780694936114.845,"name":"greek yogurt","displayName":"greek yogurt","zone":"fridge","cat":"dairy","perish":"medium","ts":1780694936114},
+{"id":1780694951739.8137,"name":"chicken thighs","displayName":"chicken thighs","zone":"fridge","cat":"meat","perish":"high","ts":1780694951739},
+{"id":1780694958688.239,"name":"cottage cheese","displayName":"cottage cheese","zone":"fridge","cat":"dairy","perish":"medium","ts":1780694958688},
+{"id":1780694966446.2717,"name":"pasta","displayName":"pasta","zone":"pantry","cat":"pasta","perish":"low","ts":1780694966447},
+{"id":1780694975508.7104,"name":"garlic","displayName":"garlic","zone":"pantry","cat":"misc","perish":"low","ts":1780694975508},
+{"id":1780695037043.4663,"name":"cantaloupe","displayName":"cantaloupe","zone":"pantry","cat":"misc","perish":"low","ts":1780695037043},
+{"id":1780695046573.465,"name":"nectarine","displayName":"nectarine","zone":"pantry","cat":"misc","perish":"low","ts":1780695046573},
+{"id":1780695052859.635,"name":"bananas","displayName":"bananas","zone":"pantry","cat":"misc","perish":"low","ts":1780695052859},
+{"id":1781105883842.6199,"name":"chicken breast","displayName":"chicken breast","zone":"fridge","cat":"meat","perish":"high","ts":1781105883842},
+{"id":1781105907774.8848,"name":"salad","displayName":"salad","zone":"fridge","cat":"produce","perish":"high","ts":1781105907774},
+{"id":1781105959241.444,"name":"cauliflower rice","displayName":"cauliflower rice","zone":"fridge","cat":"produce","perish":"high","ts":1781105959241},
+{"id":1781106062873.4397,"name":"sweet potato","displayName":"sweet potato","zone":"pantry","cat":"misc","perish":"low","ts":1781106062873},
+{"id":1781106082225.0261,"name":"onions","displayName":"onions","zone":"pantry","cat":"misc","perish":"low","ts":1781106082225},
+{"id":1781106102780.0796,"name":"dates","displayName":"dates","zone":"pantry","cat":"snack","perish":"low","ts":1781106102780},
+{"id":1781106187121.4297,"name":"apple cider vinegar","displayName":"apple cider vinegar","zone":"pantry","cat":"produce","perish":"high","ts":1781106187121,"pinnedShelf":"p1"}
 ];
 
+const SUPA_URL='https://diqojrfxpypbjfamwfbd.supabase.co/rest/v1';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRpcW9qcmZ4cHlwYmpmYW13ZmJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MDgzODYsImV4cCI6MjA5NzA4NDM4Nn0.cQJ1sdpyrKsmPXMNbCiOy4ZJp6QSDvVlk-l7OxxKS6w';
+const SUPA_HDR={'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY};
+
+function dbToItem(r){
+  return{id:r.id,name:r.name,displayName:r.display_name,zone:r.zone,cat:r.cat,
+    perish:r.perish,ts:Number(r.ts),...(r.pinned_shelf?{pinnedShelf:r.pinned_shelf}:{})};
+}
+function itemToDb(i){
+  return{id:i.id,name:i.name,display_name:i.displayName||i.name,zone:i.zone,
+    cat:i.cat,perish:i.perish||'low',ts:i.ts,pinned_shelf:i.pinnedShelf||null};
+}
+
 async function load(){
-  // 1. Try Claude persistent storage
   try{
-    if(window.storage){
-      const result=await window.storage.get(STORAGE_KEY);
-      if(result&&result.value){items=JSON.parse(result.value);return;}
-    }
-  }catch(e){console.warn('Persistent load failed:',e);}
-  // 2. Try localStorage
-  try{
-    const d=localStorage.getItem(STORAGE_KEY);
-    if(d){items=JSON.parse(d);return;}
-  }catch(e){}
-  // 3. Seed with known inventory
+    const res=await fetch(SUPA_URL+'/kitchen_items?select=*&order=ts.asc',{headers:SUPA_HDR});
+    if(res.ok){const d=await res.json();if(d.length){items=d.map(dbToItem);return;}}
+  }catch(e){console.warn('Supabase load failed:',e);}
+  // Fallback to SEED if Supabase unreachable
   items=JSON.parse(JSON.stringify(SEED));
 }
 
 async function save(){
-  const payload=JSON.stringify(items);
   try{
-    if(window.storage){await window.storage.set(STORAGE_KEY,payload);return;}
-  }catch(e){console.warn('Persistent save failed:',e);}
-  try{localStorage.setItem(STORAGE_KEY,payload);}catch(e){}
+    // Clear then re-insert the full inventory
+    await fetch(SUPA_URL+'/kitchen_items?id=gt.0',{method:'DELETE',headers:SUPA_HDR});
+    if(items.length){
+      await fetch(SUPA_URL+'/kitchen_items',{
+        method:'POST',
+        headers:{...SUPA_HDR,'Prefer':'return=minimal'},
+        body:JSON.stringify(items.map(itemToDb))
+      });
+    }
+  }catch(e){console.warn('Supabase save failed:',e);}
 }
 
 // ── PERISHABILITY ─────────────────────────────────────────────────────────────
@@ -742,7 +819,7 @@ function placeItem(item,animate){
   div.appendChild(drawCanvas(spr));
   const lbl=document.createElement('div');lbl.className='item-lbl';
   const dn=item.displayName||item.name;
-  lbl.textContent=dn.length>9?dn.slice(0,8)+'\u2026':dn;
+  lbl.textContent=dn;
   div.appendChild(lbl);
   // urgency dot
   const uc=urgencyClass(item);
@@ -1002,7 +1079,7 @@ async function suggestRecipes(){
     const lvl=item.perish||perishLevel(item.cat);
     const uc=urgencyClass(item);
     const flag=uc?.includes('udot-r')?'USE SOON':uc?.includes('udot-y')?'getting old':'';
-    return dn+(lvl!=='low'?` (${age}d old${flag?' \u2014 '+flag:''})`:' (stable)');
+    return dn+(lvl!=='low'?` (${age}d old${flag?' — '+flag:''})`:' (stable)');
   }).join('\n');
 
   const exclusions=shownRecipes.length?`\nDo NOT suggest these already-shown recipes: ${shownRecipes.join(', ')}.`:'';
@@ -1067,7 +1144,7 @@ function sanitiseJSON(str){
     if(ch==='\\'){out+=ch;escaped=true;continue;}
     if(ch==='"'){inStr=!inStr;out+=ch;continue;}
     // Inside a string, swap apostrophe for the typographic equivalent (U+2019) which is valid
-    if(inStr&&ch==="'"){out+='\u2019';continue;}
+    if(inStr&&ch==="'"){out+='’';continue;}
     out+=ch;
   }
   return out;
@@ -1220,6 +1297,9 @@ function skipDYM(){
 }
 
 document.getElementById('inp').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleAdd();}});
+
+
+
 
 (async()=>{
   await load();
