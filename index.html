@@ -108,6 +108,47 @@ select.sortsel{border:1px solid var(--line);background:var(--card);border-radius
 .empty .big{font-family:'Fraunces',Georgia,serif;font-size:19px;font-weight:700;color:var(--ink);margin:12px 0 6px}
 .empty p{font-size:13px;line-height:1.6}
 
+/* ── FRIDGE VIEW ─────────────────────────────────────────────────────── */
+.viewtoggle{display:flex;gap:4px;background:#ededf3;border-radius:10px;padding:3px;flex-shrink:0}
+.viewtoggle button{border:none;background:none;font-size:12px;font-weight:600;color:var(--muted);padding:6px 13px;border-radius:8px}
+.viewtoggle button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(30,34,64,.12)}
+.kv{display:grid;grid-template-columns:1fr;gap:16px;margin-top:14px}
+@media(min-width:560px){.kv{grid-template-columns:1fr 1fr;align-items:start}}
+.appl{border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.appl-top{display:flex;align-items:center;gap:6px;padding:9px 14px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase}
+.fridge .appl-top{background:#c8d4de;color:#5a7088}
+.pantry .appl-top{background:#8a6030;color:#f2ddb8}
+.appl-body{padding:8px}
+.fridge .appl-body{background:#eaf3fb;border:2px solid #cddcec;border-top:none}
+.pantry .appl-body{background:#7a5220;border:2px solid #3d2610;border-top:none}
+.shelf{padding:6px 6px 10px}
+.fridge .shelf{border-bottom:2px solid #cddcec}
+.fridge .shelf:last-child{border-bottom:none}
+.pantry .shelf{background:#976e3c;border:1px solid #3d2610;border-bottom:3px solid #2a1a08;border-radius:3px;margin-bottom:6px}
+.pantry .shelf:last-child{margin-bottom:0}
+.shelf-lbl{font-size:9px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;margin-bottom:6px}
+.fridge .shelf-lbl{color:#7a90a8}
+.pantry .shelf-lbl{color:#e6c896}
+.shelf-row{display:flex;flex-wrap:wrap;gap:4px;min-height:58px;align-content:flex-start;border-radius:6px;transition:background .12s,outline-color .12s;outline:2px dashed transparent;outline-offset:-2px}
+.shelf-row.drop{outline-color:var(--blue);background:rgba(159,184,230,.16)}
+.shelf-empty{font-size:10px;font-weight:600;opacity:.5;padding:8px 4px;align-self:center}
+.fridge .shelf-empty{color:#7a90a8}
+.pantry .shelf-empty{color:#e6c896}
+.fitem{width:58px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 2px;border-radius:8px;cursor:grab;position:relative;touch-action:none;user-select:none;-webkit-user-select:none;animation:popin .28s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes popin{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+.fitem:hover{background:rgba(255,255,255,.55)}
+.pantry .fitem:hover{background:rgba(255,255,255,.14)}
+.fitem.dragging{opacity:.3}
+.fitem.dim{opacity:.2;filter:grayscale(.7)}
+.fitem .ring{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.fitem .ring.warn{box-shadow:inset 0 0 0 2px var(--amber)}
+.fitem .ring.crit{box-shadow:inset 0 0 0 2px var(--red);animation:ringpulse 1.1s ease-in-out infinite}
+@keyframes ringpulse{50%{box-shadow:inset 0 0 0 2px var(--red),0 0 0 3px rgba(184,64,64,.3)}}
+.fitem-lbl{font-size:9px;font-weight:600;text-align:center;line-height:1.15;max-width:58px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;text-transform:capitalize}
+.fridge .fitem-lbl{color:#2a4058}
+.pantry .fitem-lbl{color:#f4e8d0}
+.fridge-hint{text-align:center;font-size:11px;color:var(--muted);margin-top:12px}
+
 /* ── BOTTOM SHEET ────────────────────────────────────────────────────── */
 #backdrop{position:fixed;inset:0;background:rgba(30,34,64,.4);z-index:90;opacity:0;pointer-events:none;transition:opacity .2s}
 #backdrop.on{opacity:1;pointer-events:auto}
@@ -481,7 +522,7 @@ function ageLabel(ts){
    pixel-kitchen inventories ('kitchen-items') migrate automatically.
    ════════════════════════════════════════════════════════════════════════ */
 const LS_KEY='jk-state-v2';
-let state={items:[],shopping:[],cookbook:[],prefs:{cuisines:['Korean','Thai','Lebanese','Greek'],spice:'medium',protein:'30-45g',diet:'',airfryer:true,grocery:false}};
+let state={items:[],shopping:[],cookbook:[],viewMode:'list',prefs:{cuisines:['Korean','Thai','Lebanese','Greek'],spice:'medium',protein:'30-45g',diet:'',airfryer:true,grocery:false}};
 let currentTab='kitchen';
 let pendingDYM=[];
 let currentRecipes=null;   // last generated set (session-only)
@@ -662,8 +703,7 @@ function kitchenHTML(){
   }
 
   if(state.items.length){
-    html+=`<div class="filters">
-      <input class="field" id="search-inp" placeholder="Search…" autocomplete="off">
+    const listControls=state.viewMode==='list'?`
       <div class="pillrow">
         <button class="pill ${locFilter==='all'?'on':''}" onclick="setLoc('all')">All</button>
         <button class="pill ${locFilter==='fridge'?'on':''}" onclick="setLoc('fridge')">Fridge</button>
@@ -673,10 +713,14 @@ function kitchenHTML(){
         <option value="fresh" ${sortMode==='fresh'?'selected':''}>Freshness</option>
         <option value="new" ${sortMode==='new'?'selected':''}>Newest</option>
         <option value="az" ${sortMode==='az'?'selected':''}>A–Z</option>
-      </select>
+      </select>`:'';
+    html+=`<div class="filters">
+      ${viewToggleHTML()}
+      <input class="field" id="search-inp" placeholder="Search…" autocomplete="off">
+      ${listControls}
     </div>`;
   }
-  html+=`<div id="inv-list">${listHTML()}</div>`;
+  html+=`<div id="inv-list">${!state.items.length?listHTML():(state.viewMode==='fridge'?fridgeHTML():listHTML())}</div>`;
 
   html+=`<div class="datarow">
     <button class="btn-ghost" onclick="exportData()">⬇ Export</button>
@@ -690,7 +734,126 @@ function setLoc(l){locFilter=l;render();}
 function setSort(s){sortMode=s;renderListOnly();}
 function renderListOnly(){
   const el=document.getElementById('inv-list');
-  if(el){el.innerHTML=listHTML();mountCanvases();}
+  if(el){el.innerHTML=state.viewMode==='fridge'?fridgeHTML():listHTML();mountCanvases();}
+}
+function setView(v){state.viewMode=v;save();render();}
+function viewToggleHTML(){
+  return`<div class="viewtoggle">
+    <button class="${state.viewMode==='list'?'on':''}" onclick="setView('list')">List</button>
+    <button class="${state.viewMode==='fridge'?'on':''}" onclick="setView('fridge')">Fridge</button>
+  </div>`;
+}
+
+/* ── FRIDGE VIEW ─────────────────────────────────────────────────────────
+   Items sit on category shelves as their pixel sprites. Tap opens the same
+   edit sheet; drag a sprite onto another shelf to re-file it (pins the shelf
+   and updates its fridge/pantry zone). Freshness reads as a ring: amber for
+   "use soon", pulsing red for "use today".
+   ──────────────────────────────────────────────────────────────────────── */
+const FRIDGE_SHELVES=[
+  {id:'f0',lbl:'Dairy · Eggs · Drinks',cats:['dairy','egg','drink']},
+  {id:'f1',lbl:'Produce · Herbs',cats:['produce','herb']},
+  {id:'f2',lbl:'Meat · Fish',cats:['meat','fish']},
+];
+const PANTRY_SHELVES=[
+  {id:'p0',lbl:'Grains · Pasta · Bread',cats:['grain','pasta','flour','bread']},
+  {id:'p1',lbl:'Cans · Sauces · Oils',cats:['can','sauce','oil','condiment']},
+  {id:'p2',lbl:'Snacks · Spices · Misc',cats:['spice','snack','misc']},
+];
+function shelfFor(it){
+  const shelves=it.zone==='fridge'?FRIDGE_SHELVES:PANTRY_SHELVES;
+  if(it.pinnedShelf&&shelves.some(s=>s.id===it.pinnedShelf))return it.pinnedShelf;
+  for(const s of shelves)if(s.cats.includes(it.cat))return s.id;
+  return shelves[shelves.length-1].id;
+}
+function fridgeHTML(){
+  const q=searchQ.trim().toLowerCase();
+  const appliance=(cls,title,shelves,zone)=>{
+    let sh='';
+    for(const s of shelves){
+      const items=state.items.filter(i=>i.zone===zone&&shelfFor(i)===s.id);
+      sh+=`<div class="shelf"><div class="shelf-lbl">${s.lbl}</div><div class="shelf-row" data-shelf="${s.id}">`;
+      if(!items.length)sh+=`<div class="shelf-empty">empty</div>`;
+      for(const it of items){
+        const f=freshInfo(it);
+        const dn=it.displayName||it.name;
+        const dim=q&&!(dn.toLowerCase().includes(q)||it.cat.includes(q))?' dim':'';
+        sh+=`<div class="fitem${dim}" data-id="${it.id}" title="${esc(dn)}">
+          <div class="ring${f?f.crit?' crit':' warn':''}"><span data-sprite="${esc(dn)}" data-size="40px"></span></div>
+          <div class="fitem-lbl">${esc(dn)}</div></div>`;
+      }
+      sh+=`</div></div>`;
+    }
+    return`<div class="appl ${cls}"><div class="appl-top">${title}</div><div class="appl-body">${sh}</div></div>`;
+  };
+  return`<div class="kv">
+    ${appliance('fridge','🧊 Fridge',FRIDGE_SHELVES,'fridge')}
+    ${appliance('pantry','🥫 Pantry',PANTRY_SHELVES,'pantry')}
+  </div>
+  <div class="fridge-hint">Tap an item to edit · drag it to another shelf to move it</div>`;
+}
+
+/* Drag-to-refile + tap-to-edit on shelves (pointer events → works on touch). */
+let fdrag=null;
+function initFridgeDrag(){
+  document.addEventListener('pointerdown',e=>{
+    if(currentTab!=='kitchen'||state.viewMode!=='fridge')return;
+    const el=e.target.closest&&e.target.closest('.fitem');
+    if(!el)return;
+    fdrag={id:el.dataset.id,el,x0:e.clientX,y0:e.clientY,moved:false,ghost:null,overRow:null};
+    try{el.setPointerCapture(e.pointerId);}catch(_){}
+    el.addEventListener('pointermove',onFMove);
+    el.addEventListener('pointerup',onFUp);
+    el.addEventListener('pointercancel',onFUp);
+  });
+}
+function onFMove(e){
+  if(!fdrag)return;
+  if(!fdrag.moved&&Math.hypot(e.clientX-fdrag.x0,e.clientY-fdrag.y0)<8)return;
+  if(!fdrag.moved){
+    fdrag.moved=true;
+    fdrag.el.classList.add('dragging');
+    const cv=fdrag.el.querySelector('canvas');
+    if(cv){
+      const g=document.createElement('canvas');g.width=cv.width;g.height=cv.height;g.className='px';
+      g.style.cssText='position:fixed;z-index:210;width:46px;height:46px;pointer-events:none;image-rendering:pixelated;transform:translate(-50%,-50%);filter:drop-shadow(0 6px 10px rgba(30,34,64,.35))';
+      g.getContext('2d').drawImage(cv,0,0);
+      document.body.appendChild(g);fdrag.ghost=g;
+    }
+  }
+  if(fdrag.ghost){fdrag.ghost.style.left=e.clientX+'px';fdrag.ghost.style.top=e.clientY+'px';}
+  const under=document.elementFromPoint(e.clientX,e.clientY);
+  const row=under&&under.closest?under.closest('.shelf-row'):null;
+  if(row!==fdrag.overRow){
+    if(fdrag.overRow)fdrag.overRow.classList.remove('drop');
+    fdrag.overRow=row;
+    if(row)row.classList.add('drop');
+  }
+}
+function onFUp(){
+  if(!fdrag)return;
+  const el=fdrag.el;
+  el.removeEventListener('pointermove',onFMove);
+  el.removeEventListener('pointerup',onFUp);
+  el.removeEventListener('pointercancel',onFUp);
+  if(fdrag.ghost)fdrag.ghost.remove();
+  if(fdrag.overRow)fdrag.overRow.classList.remove('drop');
+  const moved=fdrag.moved,id=fdrag.id,row=fdrag.overRow;
+  fdrag=null;
+  if(!moved){openItemSheet(id);return;}
+  if(row){
+    const shelfId=row.dataset.shelf;
+    const it=state.items.find(i=>i.id===id);
+    if(it&&shelfId&&shelfFor(it)!==shelfId){
+      snapshot();
+      it.zone=shelfId[0]==='f'?'fridge':'pantry';
+      it.pinnedShelf=shelfId;
+      save();render();
+      toast(`Moved ${it.displayName||it.name}`,{undo});
+      return;
+    }
+  }
+  el.classList.remove('dragging');
 }
 
 function filteredItems(){
@@ -1342,6 +1505,7 @@ function clearDoneShop(){
 /* ── BOOT ────────────────────────────────────────────────────────────── */
 (async()=>{
   await load();
+  initFridgeDrag();
   render();
 })();
 </script>
